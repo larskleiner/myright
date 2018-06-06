@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Knp\Snappy\Pdf;
+use Twig\Environment;
 
 class AppGooglesearch2pdfCommand extends Command {
   /**
@@ -16,13 +17,20 @@ class AppGooglesearch2pdfCommand extends Command {
   private $pdfService;
 
   /**
+   * @var Environment
+   */
+  private $twigService;
+
+  /**
    * AppGooglesearch2pdfCommand constructor.
    * @param string $name
    * @param \Knp\Snappy\Pdf $pdfService
+   * @param \Twig\Environment $twigService
    */
-  public function __construct(string $name = NULL, Pdf $pdfService) {
+  public function __construct(string $name = NULL, Pdf $pdfService, Environment $twigService) {
     parent::__construct($name);
     $this->pdfService = $pdfService;
+    $this->twigService = $twigService;
   }
 
   protected static $defaultName = 'app:googlesearch2pdf';
@@ -40,8 +48,10 @@ class AppGooglesearch2pdfCommand extends Command {
     $limit = $input->getArgument('limit');
 
     if (!empty($term) && !empty($limit)) {
-      $path = '/tmp/' . $term . '.pdf';
+      $footer = $this->twigService->render('footer.html.twig');
+      $this->pdfService->setOption('footer-html', $footer);
 
+      $path = '/tmp/' . $term . '.pdf';
       $this->pdfService->generate('https://www.google.com/search?q=' . $term . '&num=' . $limit, $path);
 
       $io->success(sprintf('A PDF for Google search "%s" was successfully created at %s.', $term, $path));
