@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+if [    $# -lt 2 ]; then
+    php bin/console help app:googlesearch2pdf
+fi
+
+php bin/console app:googlesearch2pdf $1 $2
