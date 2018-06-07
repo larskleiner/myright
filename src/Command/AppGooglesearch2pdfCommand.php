@@ -48,6 +48,11 @@ class AppGooglesearch2pdfCommand extends Command {
     $limit = $input->getArgument('limit');
 
     if (!empty($term) && !empty($limit)) {
+
+      if (!is_numeric($limit)) {
+        throw new \Exception('Number of total results must be a number');
+      }
+
       $footer = $this->twigService->render('footer.html.twig');
       $this->pdfService->setOption('footer-html', $footer);
 
